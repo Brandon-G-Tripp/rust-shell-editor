@@ -18,6 +18,34 @@ impl<T> DynamicArray<T> {
     pub fn is_empty(&self) -> bool {
         self.data.is_empty()
     } 
+
+    pub fn push(&mut self, item: T) {
+        self.data.push(item);
+    } 
+
+    pub fn pop(&mut self) -> Option<T> {
+        self.data.pop()
+    } 
+
+    pub fn insert(&mut self, index: usize, item: T) {
+        self.data.insert(index, item);
+    } 
+
+    pub fn remove(&mut self, index: usize) -> Option<T> {
+        if index < self.len() {
+            Some(self.data.remove(index))
+        } else {
+            None
+        }
+    } 
+
+    pub fn get(&self, index: usize) -> Option<&T> {
+        self.data.get(index)
+    } 
+
+    pub fn clear(&mut self) {
+        self.data.clear();
+    } 
 }
 
 #[cfg(test)]
