@@ -94,4 +94,22 @@ mod tests {
         hash_table.insert(2, "updated two".to_string());
         assert_eq!(hash_table.len(), 3);
     } 
+
+    #[test]
+    fn test_get() {
+        let mut hash_table = HashTable::new(10);
+
+        // Insert some kv pairs
+        hash_table.insert(1, "one".to_string());
+        hash_table.insert(2, "two".to_string());
+        hash_table.insert(3, "three".to_string());
+
+        // Test retrieving value for a key that exists
+        assert_eq!(hash_table.get(&1), Some(&"one".to_string()));
+        assert_eq!(hash_table.get(&2), Some(&"two".to_string()));
+        assert_eq!(hash_table.get(&3), Some(&"three".to_string()));
+
+        // Test retrieving a value for a key 
+        assert_eq!(hash_table.get(&4), None);
+    } 
 } 
