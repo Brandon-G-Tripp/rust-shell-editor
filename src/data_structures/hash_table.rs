@@ -52,6 +52,19 @@ where
         key.hash(&mut hasher);
         (hasher.finish() % self.buckets.len() as u64) as usize
     } 
+
+    pub fn get(&self, key: &K) -> Option<&V> {
+        let bucket_index = self.hash(key);
+        let bucket = &self.buckets[bucket_index];
+
+        for &(ref k, ref v) in bucket.iter() {
+            if *k == *key {
+                return Some(v);
+            }
+        } 
+
+        None
+    } 
 }
 
 #[cfg(test)]
@@ -111,5 +124,22 @@ mod tests {
 
         // Test retrieving a value for a key 
         assert_eq!(hash_table.get(&4), None);
+    } 
+
+    #[test]
+    fn test_remove() {
+        let mut hash_table = HashTable::new(10);
+
+        // Insert some kv pairs
+        hash_table.insert(1, "one".to_string());
+        hash_table.insert(2, "two".to_string());
+        hash_table.insert(3, "three".to_string());
+
+        assert_eq!(hash_table.remove(&2), Some(&"two".to_string()));
+        assert_eq!(hash_table.len(), 2);
+        assert_eq!(hash_table.get(&2), None);
+
+        assert_eq!(hash_table.remove(&4), None);
+        assert_eq!(hash_table.len(), 2);
     } 
 } 
