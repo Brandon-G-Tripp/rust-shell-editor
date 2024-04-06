@@ -80,6 +80,24 @@ where
 
         None
     }
+
+    pub fn contains_key(&self, key: &K) -> bool {
+        let bucket_index = self.hash(key);
+        let bucket = &self.buckets[bucket_index];
+
+        for &(ref k, _) in bucket.iter() {
+            if *k == *key {
+                return true;
+            }
+        } 
+
+        false
+    } 
+
+    pub fn clear(&mut self) {
+        self.buckets.iter_mut().for_each(|bucket| bucket.clear());
+        self.size = 0;
+    }
 }
 
 #[cfg(test)]
@@ -173,5 +191,20 @@ mod tests {
 
         assert!(!hash_table.contains_key(&4));
 
+    } 
+
+    #[test]
+    fn test_clear() {
+        let mut hash_table = HashTable::new(10);
+
+        // Insert some kv pairs
+        hash_table.insert(1, "one".to_string());
+        hash_table.insert(2, "two".to_string());
+        hash_table.insert(3, "three".to_string());
+
+        hash_table.clear();
+
+        assert_eq!(hash_table.len(), 0);
+        assert!(hash_table.is_empty());
     } 
 } 
