@@ -65,6 +65,21 @@ where
 
         None
     } 
+
+    pub fn remove(&mut self, key: &K) -> Option<V> {
+        let bucket_index = self.hash(key);
+        let bucket = &mut self.buckets[bucket_index];
+
+        for i in 0..bucket.len() {
+            if bucket[i].0 == *key {
+                let (_, value) = bucket.remove(i);
+                self.size -= 1;
+                return Some(value);
+            } 
+        } 
+
+        None
+    }
 }
 
 #[cfg(test)]
@@ -135,11 +150,28 @@ mod tests {
         hash_table.insert(2, "two".to_string());
         hash_table.insert(3, "three".to_string());
 
-        assert_eq!(hash_table.remove(&2), Some(&"two".to_string()));
+        assert_eq!(hash_table.remove(&2), Some("two".to_string()));
         assert_eq!(hash_table.len(), 2);
         assert_eq!(hash_table.get(&2), None);
 
         assert_eq!(hash_table.remove(&4), None);
         assert_eq!(hash_table.len(), 2);
+    } 
+
+    #[test]
+    fn test_contains_key() {
+        let mut hash_table = HashTable::new(10);
+
+        // Insert some kv pairs
+        hash_table.insert(1, "one".to_string());
+        hash_table.insert(2, "two".to_string());
+        hash_table.insert(3, "three".to_string());
+
+        assert!(hash_table.contains_key(&1));
+        assert!(hash_table.contains_key(&2));
+        assert!(hash_table.contains_key(&3));
+
+        assert!(!hash_table.contains_key(&4));
+
     } 
 } 
