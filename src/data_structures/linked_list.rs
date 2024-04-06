@@ -10,7 +10,7 @@ pub struct LinkedList<T> {
     size: usize,
 } 
 
-impl<T> LinkedList<T> {
+impl<T: std::fmt::Debug> LinkedList<T> {
     pub fn new() -> Self {
         LinkedList {
             head: None, 
@@ -49,11 +49,12 @@ impl<T> LinkedList<T> {
             next: None,
         });
 
-        if let Some(mut last_node) = self.head.as_mut() {
-            while let Some(next_node) = mem::take(&mut last_node.next) {
-                *last_node = next_node;
+        if let Some(ref mut last_node) = self.head {
+            let mut current = last_node;
+            while let Some(ref mut next_node) = current.next {
+                current = next_node;
             } 
-            last_node.next = Some(new_node);
+            current.next = Some(new_node);
         } else {
             self.head = Some(new_node);
         } 
@@ -61,26 +62,29 @@ impl<T> LinkedList<T> {
     } 
 
     pub fn pop_back(&mut self) -> Option<T> {
-        match self.head.take() {
-            Some(mut node) => {
-                if node.next.is_none() {
-                    self.size -= 1;
-                    Some(node.element)
-                } else {
-                    let mut current = &mut node;
-                    while let Some(ref mut next_node) = current.next {
-                        if next_node.next.is_none() {
-                            let last_node = next_node.next.take().unwrap();
-                            self.size -= 1;
-                            return Some(last_node.element);
-                        }
-                        current = next_node;
+        if let Some(mut node) = self.head.take() {
+            if node.next.is_none() {
+                self.size -= 1;
+                Some(node.element)
+            } else {
+                let mut current = node.as_mut();
+                while let Some(ref mut next_node) = current.next {
+                    if next_node.next.is_none() {
+                        let removed_element = mem::replace(&mut next_node.element, 
+                            unsafe {  mem::MaybeUninit::uninit().assume_init() }
+                        );
+                        current.next = None;
+                        self.size -= 1;
+                        self.head = Some(node);
+                        return Some(removed_element);
                     }
-                    self.head = Some(node);
-                    None
+                    current = current.next.as_mut().unwrap();
                 }
+                self.head = Some(node);
+                None
             }
-            None => None,
+        } else {
+            None
         }
     } 
 
@@ -139,7 +143,7 @@ mod tests {
     } 
 
     #[test]
-    fn test_push_back_and_pop_bac() {
+    fn test_push_back_and_pop_back() {
         let mut list = LinkedList::new();
         list.push_back(1);
         list.push_back(2);
