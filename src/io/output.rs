@@ -10,9 +10,16 @@ pub fn format_output(text: &str, color: &str) -> String {
     format!("\x1b[{}m{}\x1b[0m", color, text)
 } 
 
+pub fn write_to_file<W: Write>(mut writer: W, text: &str) -> io::Result<()> {
+    writer.write_all(text.as_bytes())?;
+    writer.flush()?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::{fs::File, io::Read};
 
     #[test]
     fn test_write_output() {
@@ -39,4 +46,22 @@ mod tests {
 
         assert_eq!(formatted_output, "\x1b[31mColored message\x1b[0m");
     } 
+
+     #[test]
+    fn test_write_to_file() {
+        // Create a temporary file
+        let file = File::create("test_output.txt").unwrap();
+
+        // Call the function to write to the file
+        let text = "Hello, file!";
+        write_to_file(file, text).unwrap();
+
+        // Open the file for reading
+        let mut file = File::open("test_output.txt").unwrap();
+        let mut content = String::new();
+        file.read_to_string(&mut content).unwrap();
+
+        // Assert that the content is written correctly
+        assert_eq!(content, "Hello, file!");
+    }
 }
