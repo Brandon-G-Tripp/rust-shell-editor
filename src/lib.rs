@@ -7,3 +7,8 @@ pub mod data_structures {
     pub mod linked_list;
     pub mod hash_table;
 } 
+
+pub mod io {
+    pub mod input;
+    pub mod output;
+} 
