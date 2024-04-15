@@ -1,8 +1,15 @@
 use std::env;
 use std::io::{self, BufRead, BufReader, Read};
 
+
 pub fn read_args() -> Vec<String> {
     env::args().collect()
+} 
+
+pub fn read_key<R: Read>(reader: &mut R) -> Result<char, io::Error> {
+    let mut buffer = [0, 1];
+    reader.read_exact(&mut buffer)?;
+    Ok(buffer[0] as char)
 } 
 
 pub fn read_line<R: BufRead>(reader: &mut R) -> Result<String, io::Error> {
