@@ -28,6 +28,8 @@ mod tests {
 
     #[test]
     fn test_read_args() {
+        std::env::set_var("RUST_TEST_ENV", "true");
+
         // Spawn a new process with the desired command line arguments
         let output = Command::new("cargo")
             .arg("run")
