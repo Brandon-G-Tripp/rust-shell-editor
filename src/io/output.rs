@@ -1,4 +1,20 @@
 use std::io::{self, Write};
+use termion::{clear, cursor};
+
+pub fn write_text<W: Write>(writer: &mut W, text: &str) -> io::Result<()> {
+    writer.write_all(text.as_bytes())?;
+    writer.flush()
+}
+
+pub fn clear_screen<W: Write>(writer: &mut W) -> io::Result<()> {
+    write!(writer, "{}", clear::All)?;
+    writer.flush()
+}
+
+pub fn set_cursor_position<W: Write>(writer: &mut W, x: u16, y: u16) -> io::Result<()> {
+    write!(writer, "{}", cursor::Goto(x, y))?;
+    writer.flush()
+}
 
 pub fn write_output<W: Write>(writer: &mut W, text: &str) -> io::Result<()> {
     writer.write_all(text.as_bytes())?;
