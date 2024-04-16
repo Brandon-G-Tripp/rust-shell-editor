@@ -31,6 +31,14 @@ impl Renderer {
         writer.flush()?;
         Ok(())
     } 
+
+    pub fn scroll_up(&mut self) {
+        self.scroll = self.scroll.saturating_sub(1);
+    } 
+
+    pub fn scroll_down(&mut self) {
+        self.scroll = self.scroll.saturating_add(1);
+    } 
 } 
 
 
