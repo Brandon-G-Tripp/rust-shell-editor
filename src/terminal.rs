@@ -1,8 +1,9 @@
-use std::io::{self, Writer};
+use std::io::{self, Write, Read, BufRead};
 
 use termion::event::Key;
-use termion::input::TermRead;
-use termion::raw::IntoRawMode;
+
+use crate::io::input::{ read_key, read_line};
+use crate::io::output::{write_text, clear_screen, set_cursor_position};
 
 pub struct Terminal {
     size: (u16, u16),
@@ -17,7 +18,7 @@ impl Terminal {
     } 
 
     pub fn read_key<R: Read>(&mut self, reader: &mut R) -> Result<Key, io::Error> {
-        match read_key() {
+        match read_key(reader) {
             Ok(key) => Ok(convert_key(key)),
             Err(err) => Err(err),
         } 
@@ -53,10 +54,17 @@ mod tests {
 
     #[test]
     fn test_read_key() {
-        let mut mock_input = Cursor::new(b"a");
+        let input = b"a\n";
+        let mut reader = Cursor::new(input);
         let mut terminal = Terminal::new();
-        let key = terminal.read_key(&mut mock_input).unwrap();
-        assert_eq!(key, Key::Char('a'));
+        match terminal.read_key(&mut reader){
+            Ok(key) => assert_eq!(key, Key::Char('a')),
+            Err(err) => {
+                eprintln!("Error reading key: {}", err);
+                assert!(false, "Failed to read key");
+            } 
+
+        }
     }
 
     #[test]
