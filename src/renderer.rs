@@ -12,7 +12,17 @@ impl Renderer {
     } 
 
     pub fn draw_text<W: Write>(&self, text: &str, x: usize, y: usize) {
-        write!(writer, "{}{}", termion::cursor::Goto(x as u16 + 1, y as u16 + 1), text);
+        let terminal_width = termion::terminal_size().unwrap().0 as usize;
+        let mut line_width = 0;
+        for (i, c) in text.chars().enumerate() {
+            if line_width >= terminal_width {
+                write!(writer, "\n")?;
+                line_width = 0;
+            } 
+            write!(writer, "{}", c)?;
+            line_width += 1;
+        } 
+        Ok(())
     } 
 
     pub fn draw_cursor<W: Write>(&self, x: usize, y: usize) {
@@ -102,4 +112,57 @@ mod tests {
         );
         assert_eq!(String::from_utf8(output).unwrap(), expected_output);
     } 
+
+    #[test]
+   fn test_render_with_scrolling() {
+       let mut renderer = Renderer::new();
+       let mut output = Vec::new();
+       let mut text_buffer = TextBuffer::new();
+       text_buffer.insert_line(0, "Line 1".to_string());
+       text_buffer.insert_line(1, "Line 2".to_string());
+       text_buffer.insert_line(2, "Line 3".to_string());
+       let cursor = Cursor::new();
+       cursor.move_to(1, 0);
+
+       // Render without scrolling
+       renderer.render(&mut output, &text_buffer, &cursor).unwrap();
+       let expected_output = format!(
+           "{}{}Line 1\nLine 2\nLine 3\n{}",
+           clear::All,
+           color::Fg(color::Reset),
+           cursor::Goto(1, 2)
+       );
+       assert_eq!(String::from_utf8(output.clone()).unwrap(), expected_output);
+
+       // Render with scrolling
+       renderer.scroll_down();
+       output.clear();
+       renderer.render(&mut output, &text_buffer, &cursor).unwrap();
+       let expected_output = format!(
+           "{}{}Line 2\nLine 3\n{}",
+           clear::All,
+           color::Fg(color::Reset),
+           cursor::Goto(1, 1)
+       );
+       assert_eq!(String::from_utf8(output).unwrap(), expected_output);
+   }
+
+    #[test]
+   fn test_render_with_line_wrapping() {
+       let renderer = Renderer::new();
+       let mut output = Vec::new();
+       let mut text_buffer = TextBuffer::new();
+       text_buffer.insert_line(0, "This is a long line that should wrap".to_string());
+       let cursor = Cursor::new();
+       cursor.move_to(0, 0);
+
+       renderer.render(&mut output, &text_buffer, &cursor).unwrap();
+       let expected_output = format!(
+           "{}{}This is a long line that \nshould wrap\n{}",
+           clear::All,
+           color::Fg(color::Reset),
+           cursor::Goto(1, 1)
+       );
+       assert_eq!(String::from_utf8(output).unwrap(), expected_output);
+   }
 } 
