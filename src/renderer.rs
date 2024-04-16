@@ -3,6 +3,9 @@ pub struct Renderer {
 }
 
 impl Renderer {
+    pub fn new() -> Self {
+        Self { scroll: 0 }
+    } 
     pub fn clear_screen<W: Write>(&self, writer: &mut W) -> io::Result<()> {
         write!(writer, "{}{}", clear::All, color::Fg(color::Reset))?;
         Ok(())
@@ -19,7 +22,8 @@ impl Renderer {
     pub fn render<W: Write>(&self, text_buffer: &TextBuffer, cursor: &Cursor) {
         self.clear_screen(writer)?;
         let lines = text_buffer.get_lines();
-        for (y, line) in lines.iter().enumerate() {
+        let terminal_height = termion::terminal_size().unwrap().1 as usize;
+        for (y, line) in lines.iter().skip(self.scroll).take(terminal_height).enumerate() {
            self.draw_text(writer, line, 0, y)?; 
         } 
         let (cursor_x, cursor_y) = cursor.position();
