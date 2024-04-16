@@ -1,4 +1,6 @@
 pub mod app;
+pub mod terminal;
+pub mod motions;
 
 pub mod utils {
     pub mod string;
