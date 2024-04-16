@@ -10,7 +10,11 @@ impl TextBuffer {
     } 
 
     pub fn insert_char(&mut self, pos: usize, ch: char) {
-        self.content.insert(pos, ch);
+        if ch == '\n' {
+            self.content.insert_str(pos, "\n")
+        } else {
+            self.content.insert(pos, ch);
+        }
     } 
 
     pub fn delete_char(&mut self, pos: usize) {
@@ -24,6 +28,10 @@ impl TextBuffer {
     pub fn get_lines(&self) -> Vec<&str> {
         self.content.lines().collect()
     }
+
+    pub fn clear(&mut self) {
+        self.content.clear();
+    } 
 } 
 
 #[cfg(test)]
@@ -69,5 +77,13 @@ mod tests {
         let mut buffer = TextBuffer::new();
         buffer.content = "Hello\nWorld".to_string();
         assert_eq!(buffer.get_lines(), vec!["Hello", "World"]);
+    } 
+
+    #[test] 
+    fn test_clear() {
+        let mut buffer = TextBuffer::new();
+        buffer.content = "Hello\nWorld".to_string();
+        buffer.clear();
+        assert_eq!(buffer.content, "");
     } 
 } 
