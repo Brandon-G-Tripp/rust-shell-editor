@@ -1,8 +1,10 @@
 [package]
-name = "rust-shell-editor"
+name = "upepo"
 version = "0.1.0"
 edition = "2021"
+description = "Upepo is a quick, responseive IDE-like application focused on modal editing and an integrated shell/command line \n Upepo means 'the wind' in swahili"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+termion = "*"
