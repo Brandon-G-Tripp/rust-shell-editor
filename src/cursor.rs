@@ -32,6 +32,10 @@ impl Cursor {
         self.line = line;
         self.col = col;
     } 
+
+    pub fn position(&self) -> (usize, usize) {
+        (self.line, self.col)
+    } 
 } 
 
 #[cfg(test)]
