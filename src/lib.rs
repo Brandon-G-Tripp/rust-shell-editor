@@ -1,8 +1,8 @@
 pub mod app;
-// commented out to handle in the core ds branch
-// pub mod terminal;
+pub mod terminal;
 pub mod text_buffer;
 pub mod cursor;
+pub mod motions;
 
 pub mod utils {
     pub mod string;
