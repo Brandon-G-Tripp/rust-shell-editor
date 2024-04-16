@@ -1,5 +1,7 @@
 pub mod app;
 pub mod terminal;
+pub mod text_buffer;
+pub mod cursor;
 pub mod motions;
 
 pub mod utils {
